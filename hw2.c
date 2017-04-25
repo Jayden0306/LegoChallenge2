@@ -14,6 +14,22 @@ void moveForward(int left, int right) {
 	setMotorSpeed(rightMotor, right);
 }
 
+void moveBackwards(int left, int right) {
+	setMotorSpeed(leftMotor, left);
+	setMotorSpeed(rightMotor, right);
+}
+
+//this is for wondering right
+void turnRight() {
+	setMotorSpeed(leftMotor, 40);
+	setMotorSpeed(rightMotor, -40);
+}
+
+//this is for wondering left
+void turnLeft() {
+	setMotorSpeed(leftMotor, -40);
+	setMotorSpeed(rightMotor, 40);
+}
 
 //this is for wondering right
 void randomRight() {
@@ -26,6 +42,20 @@ void randomLeft() {
 	setMotorSpeed(leftMotor, 35);
 	setMotorSpeed(rightMotor, 45);
 }
+
+void turnRandomly() {
+	if(rand() % 100 < 50) {
+		turnLeft();	
+		wait1Msec(600);
+	} else {
+		turnRight();
+		wait1Msec(600);
+	}
+}
+
+
+
+
 
 //this is the random walking task.
 task randomWalk() {
@@ -58,10 +88,11 @@ task randomWalk() {
 	}
 }
 
+/*
 void shiftElements(int *data) {
 		int i;
 		for(i = 0; i < 4; i++) {
-			data[i] = data[i+1];	
+			data[i] = data[i+1];
 		}
 }
 
@@ -74,41 +105,64 @@ float calculateAvg(int *data, int count) {
 	avg /= count;
 	return avg;
 }
+*/
+
+
+task lineFollow() {
+	int leftReflected, rightReflected;
+	int left = 0;
+	int right = 0;
+	while(true) {
+		leftReflected = getColorReflected(leftLight);
+		rightReflected = getColorReflected(rightLight);
+		if( leftReflected < 2) { 
+			stopTask(randomWalk);
+			if(rightReflected < 2) {
+				//move forward
+				moveForward(20, 20);
+				wait1Msec(100);
+			} else {
+				//move left 
+				setMotorSync(leftMotor, rightMotor, -20, 20);
+				wait1Msec(100);
+			}
+		} else if(rightReflected < 2){
+				stopTask(randomWalk);
+			// move right
+				setMotorSync(leftMotor, rightMotor, 20, 20);
+				wait1Msec(100);
+		}else {
+			startTask(randomWalk);
+		}
+		
+		
+	}
+}
 
 
 task detect() {
-	int count = 0;
-	int data[5];
 	float avg = 0;
-		
-	while(true) {
-		/*if (getColorName(S4) == colorBlack) {
-		playTone(784, 15);
-		delay(1000);
-		} */
-		
-		//displayBigTextLine(3, "%d", distance);
-		//displayBigTextLine(5, "%d", speed);
+	int total = 0;
+	int i;
 
-		
-		int distance = getUSDistance(ultraSonic);
-		if(count < 5) {
-			data[count] = distance;
-			count++;
-		} else {
-			shiftElements(data);
-			data[4] = distance;
+while(true) {
+	
+		for(i = 0; i < 30; i++) {
+				int distance = getUSDistance(ultraSonic);
+				//data[i] = distance;
+				total += distance;
 		}
-		
-		avg = calculateAvg(data, count);
-		
+
+		avg = total/ 30;
+
 			displayBigTextLine(3, "%f", avg);
-		  displayBigTextLine(5, "%d", distance);
-		
+		  //displayBigTextLine(5, "%d", distance);
+
 
 		//check if the obstacle is in the range of detection
 		if(avg < 90) {
 			stopTask(randomWalk);
+			//stopTask(lineFollow);
 			if(avg > 70) {
 				speed = 80;
 				moveForward(speed, speed);
@@ -140,19 +194,27 @@ task detect() {
 			}else {
 				moveForward(0, 0);
 				wait1Msec(4000);
+				moveBackwards(-40, -40);
+				wait1Msec(1500);
+				turnRandomly();
 				startTask(randomWalk);
+				//startTask(lineFollow);
 			}
-			//wait1Msec(400);
 			}else{
-
+				startTask(randomWalk);
+				//startTask(lineFollow);
 		}
+		avg = 0;
+		total = 0;
 	}
 }
 
 task main()
 {
-	startTask(detect);
 	startTask(randomWalk);
+	//startTask(lineFollow);
+	startTask(detect);
+	
 	while(true) {
 
 	}
