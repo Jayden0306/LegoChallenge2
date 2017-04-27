@@ -15,79 +15,99 @@ void moveForward(int left, int right) {
 }
 
 task detect() {
-		while(true) {
+	while(true) {
 		/*if (getColorName(S4) == colorBlack) {
-			playTone(784, 15);
-			delay(1000);
+		playTone(784, 15);
+		delay(1000);
 		} */
 		int distance = getUSDistance(ultraSonic);
 		displayBigTextLine(3, "%d", distance);
 		displayBigTextLine(5, "%d", speed);
-		
-		moveForward(70, 70);
-		
+
+		moveForward(40, 40);
+
 		//check if the obstacle is in the range of detection
 		if(distance < 90) {
 			if(distance > 70) {
-				speed = 50;
+				speed = 80;
+				moveForward(speed, speed);
+				wait1Msec(800);
+				}
+				//else if (distance > 60){
+				//speed = 75;
+				//moveForward(speed, speed);
+				//wait1Msec(400);
+				//}
+				else if(distance > 50){
+				speed = 75;
+				moveForward(speed, speed);
+				wait1Msec(800);
+				}
+				//else if(distance > 40){
+				//speed = 45;
+				//moveForward(speed, speed);
+				//wait1Msec(400);
+				//}
+				else if(distance > 30) {
+				speed = 60;
+				moveForward(speed, speed);
+				wait1Msec(800);
+				}else if (distance > 20) {
+				speed = 55;
+				moveForward(speed, speed);
+				wait1Msec(800);
+				}else if (distance > 13) {
+				speed = 30;
 				moveForward(speed, speed);
 				wait1Msec(400);
-			}else if(distance > 50){
-				speed = 40;
-				moveForward(speed, speed);
-				wait1Msec(400);
-			}else if(distance > 30) {
-				speed = 25;
-				moveForward(speed, speed);
-				wait1Msec(400);
-			}else if (distance > 23) {
+				} else if (distance > 7) {
 				speed = 15;
 				moveForward(speed, speed);
-				wait1Msec(400);
-			}else if (distance > 10) {
-				speed = 10;
+				wait1Msec(300);
+				}else if (distance > 3) {
+				speed = 5;
 				moveForward(speed, speed);
-				wait1Msec(400);
-			} else {
+				wait1Msec(100);
+				}else {
 				moveForward(0, 0);
 				wait1Msec(2000);
 			}
 			//wait1Msec(400);
-		}else{
-			
-		
+			}else{
+
+
 		}
-		
-		
-		
-		
-		
-		
-	/*	
-		
+
+
+
+
+
+
+		/*
+
 		if (distance < 90 && stoppeds == 0) {
-			moveForward(speed, speed);
+		moveForward(speed, speed);
 		//setMotorSync(leftMotor, rightMotor, 0, speed);
 		wait1Msec(100);
 		speed -= 1;
-		
-				if( getUSDistance(ultraSonic) < 10 && stoppeds == 0) {
-					speed = 0;
-					moveForward(speed, speed);
-					stoppeds = 1;
-				wait1Msec(2000);
-			}
-			
-			
-			
-			
-			
+
+		if( getUSDistance(ultraSonic) < 10 && stoppeds == 0) {
+		speed = 0;
+		moveForward(speed, speed);
+		stoppeds = 1;
+		wait1Msec(2000);
 		}
 
-		
-		
+
+
+
+
+		}
+
+
+
 		else {
-			//moveForward(50 * getUSDistance(ultraSonic))
+		//moveForward(50 * getUSDistance(ultraSonic))
 		speed = 0;
 		setMotorSync(leftMotor, rightMotor, 0, speed);
 		wait1Msec(2000);
@@ -100,6 +120,49 @@ task main()
 {
 	startTask(detect);
 	while(true) {
-	
+
 	}
 }
+
+////this is for wondering right
+//void randomRight() {
+//	setMotorSpeed(leftMotor, 60);
+//	setMotorSpeed(rightMotor, 50);
+//}
+
+////this is for wondering left
+//void randomLeft() {
+//	setMotorSpeed(leftMotor, 50);
+//	setMotorSpeed(rightMotor, 60);
+//}
+
+////this is the random walking task.
+//task randomWalk() {
+//	//varibles that
+//	long rTime = 0;
+//	long turnProb = 0;
+//	long rightProbability = 50;
+//	long leftProbability = 50;
+
+
+////this loop will let robot walking repeatly but with random pattern.
+//  while(true) {
+//  	//generates number between 0 and 99.
+//  	//starts with 50/50 chance of going left or right.
+//  	//lower end of probability will always be for turning left.
+//  	turnProb = rand() % 100;
+//  	rTime = rand() % 900 + 300;
+
+//	//random turning algorithm.
+//  	if(turnProb < leftProbability) {
+//  		randomLeft();
+//  		rightProbability += 10;
+//  		leftProbability -= 10;
+//  	} else {
+//  		randomRight();
+//  		rightProbability -= 10;
+//  		leftProbability += 10;
+//  	}
+//		wait1Msec(rTime);
+//	}
+//}
