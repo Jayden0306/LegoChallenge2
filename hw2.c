@@ -14,69 +14,193 @@ void moveForward(int left, int right) {
 	setMotorSpeed(rightMotor, right);
 }
 
-task detect() {
-	while(true) {
-		/*if (getColorName(S4) == colorBlack) {
-		playTone(784, 15);
-		delay(1000);
-		} */
-		int distance = getUSDistance(ultraSonic);
-		displayBigTextLine(3, "%d", distance);
-		displayBigTextLine(5, "%d", speed);
+void moveBackwards(int left, int right) {
+	setMotorSpeed(leftMotor, left);
+	setMotorSpeed(rightMotor, right);
+}
 
-		moveForward(40, 40);
+//this is for wondering right
+void turnRight() {
+	setMotorSpeed(leftMotor, 40);
+	setMotorSpeed(rightMotor, -40);
+}
+
+//this is for wondering left
+void turnLeft() {
+	setMotorSpeed(leftMotor, -40);
+	setMotorSpeed(rightMotor, 40);
+}
+
+//this is for wondering right
+void randomRight() {
+	setMotorSpeed(leftMotor, 45);
+	setMotorSpeed(rightMotor, 35);
+}
+
+//this is for wondering left
+void randomLeft() {
+	setMotorSpeed(leftMotor, 35);
+	setMotorSpeed(rightMotor, 45);
+}
+
+void turnRandomly() {
+	if(rand() % 100 < 50) {
+		turnLeft();
+		wait1Msec(600);
+	} else {
+		turnRight();
+		wait1Msec(600);
+	}
+}
+
+
+
+
+
+//this is the random walking task.
+task randomWalk() {
+	//varibles that
+	long rTime = 0;
+	long turnProb = 0;
+	long rightProbability = 50;
+	long leftProbability = 50;
+
+
+//this loop will let robot walking repeatly but with random pattern.
+  while(true) {
+  	//generates number between 0 and 99.
+  	//starts with 50/50 chance of going left or right.
+  	//lower end of probability will always be for turning left.
+  	turnProb = rand() % 100;
+  	rTime = rand() % 900 + 300;
+
+	//random turning algorithm.
+  	if(turnProb < leftProbability) {
+  		randomLeft();
+  		rightProbability += 10;
+  		leftProbability -= 10;
+  	} else {
+  		randomRight();
+  		rightProbability -= 10;
+  		leftProbability += 10;
+  	}
+		wait1Msec(rTime);
+	}
+}
+
+/*
+void shiftElements(int *data) {
+		int i;
+		for(i = 0; i < 4; i++) {
+			data[i] = data[i+1];
+		}
+}
+
+float calculateAvg(int *data, int count) {
+	int i;
+	int avg = 0;
+	for(i = 0; i < count; i++) {
+		avg += data[i];
+	}
+	avg /= count;
+	return avg;
+}
+*/
+
+
+task lineFollow() {
+	int leftReflected, rightReflected;
+	int left = 0;
+	int right = 0;
+	while(true) {
+		leftReflected = getColorReflected(leftLight);
+		rightReflected = getColorReflected(rightLight);
+		if( leftReflected < 2) {
+			stopTask(randomWalk);
+			if(rightReflected < 2) {
+				//move forward
+				moveForward(20, 20);
+				wait1Msec(100);
+			} else {
+				//move left
+				setMotorSync(leftMotor, rightMotor, -20, 20);
+				wait1Msec(100);
+			}
+		} else if(rightReflected < 2){
+				stopTask(randomWalk);
+			// move right
+				setMotorSync(leftMotor, rightMotor, 20, 20);
+				wait1Msec(100);
+		}else {
+			startTask(randomWalk);
+		}
+
+
+	}
+}
+
+
+task detect() {
+	float avg = 0;
+	int total = 0;
+	int i;
+
+while(true) {
+
+		for(i = 0; i < 30; i++) {
+				int distance = getUSDistance(ultraSonic);
+				//data[i] = distance;
+				total += distance;
+		}
+
+		avg = total/ 30;
+
+			displayBigTextLine(3, "%f", avg);
+		  //displayBigTextLine(5, "%d", distance);
+
 
 		//check if the obstacle is in the range of detection
-		if(distance < 90) {
-			if(distance > 70) {
+		if(avg < 90) {
+			stopTask(randomWalk);
+			//stopTask(lineFollow);
+			if(avg > 70) {
 				speed = 80;
 				moveForward(speed, speed);
 				wait1Msec(800);
-				}
-				//else if (distance > 60){
-				//speed = 75;
-				//moveForward(speed, speed);
-				//wait1Msec(400);
-				//}
-				else if(distance > 50){
+			}else if(avg > 50){
 				speed = 75;
 				moveForward(speed, speed);
 				wait1Msec(800);
-				}
-				//else if(distance > 40){
-				//speed = 45;
-				//moveForward(speed, speed);
-				//wait1Msec(400);
-				//}
-				else if(distance > 30) {
+			}else if(avg > 30) {
 				speed = 60;
 				moveForward(speed, speed);
 				wait1Msec(800);
-				}else if (distance > 20) {
+			}else if (avg > 20) {
 				speed = 55;
 				moveForward(speed, speed);
 				wait1Msec(800);
-				}else if (distance > 13) {
+			}else if (avg > 13) {
 				speed = 30;
 				moveForward(speed, speed);
 				wait1Msec(400);
-				} else if (distance > 7) {
+			} else if (avg > 7) {
 				speed = 15;
 				moveForward(speed, speed);
 				wait1Msec(300);
-				}else if (distance > 3) {
+			}else if (avg > 3) {
 				speed = 5;
 				moveForward(speed, speed);
 				wait1Msec(100);
-				}else {
+			}else {
 				moveForward(0, 0);
-				wait1Msec(2000);
+				wait1Msec(4000);
+				moveBackwards(-40, -40);
+				wait1Msec(1500);
+				turnRandomly();
+				startTask(randomWalk);
+				//startTask(lineFollow);
 			}
-			//wait1Msec(400);
-			}else{
 
-
-		}
 
 
 
@@ -113,12 +237,22 @@ task detect() {
 		wait1Msec(2000);
 		}
 		//setMotorSync(leftMotor,rightMotor, 0, 50);*/
+
+			}else{
+				startTask(randomWalk);
+				//startTask(lineFollow);
+		}
+		avg = 0;
+		total = 0;
 	}
 }
 
 task main()
 {
+	startTask(randomWalk);
+	//startTask(lineFollow);
 	startTask(detect);
+
 	while(true) {
 
 	}
