@@ -77,12 +77,16 @@ task randomWalk() {
 	//random turning algorithm.
   	if(turnProb < leftProbability) {
   		randomLeft();
-  		rightProbability += 10;
-  		leftProbability -= 10;
+  		if(leftProbability > 20) {
+  			rightProbability += 10;
+  			leftProbability -= 10;
+  		}
   	} else {
   		randomRight();
-  		rightProbability -= 10;
-  		leftProbability += 10;
+  		if(rightProbability > 20) {
+  			rightProbability -= 10;
+  			leftProbability += 10;
+  		}
   	}
 		wait1Msec(rTime);
 	}
@@ -115,27 +119,33 @@ task lineFollow() {
 	while(true) {
 		leftReflected = getColorReflected(leftLight);
 		rightReflected = getColorReflected(rightLight);
-		if( leftReflected < 2) {
+
+		if( leftReflected < 3) {
 			stopTask(randomWalk);
-			if(rightReflected < 2) {
+			if(rightReflected < 3) {
 				//move forward
 				moveForward(20, 20);
-				wait1Msec(100);
+
+				//tweak left and right
+
+
+				wait1Msec(50);
+				startTask(randomWalk);
 			} else {
 				//move left
-				setMotorSync(leftMotor, rightMotor, -20, 20);
-				wait1Msec(100);
+				setMotorSync(leftMotor, rightMotor, -30, 20);
+				wait1Msec(150);
 			}
-		} else if(rightReflected < 2){
+		} else if(rightReflected < 3){
 				stopTask(randomWalk);
 			// move right
-				setMotorSync(leftMotor, rightMotor, 20, 20);
-				wait1Msec(100);
+				setMotorSync(leftMotor, rightMotor, 30, 20);
+				wait1Msec(150);
+				startTask(randomWalk);
 		}else {
-			startTask(randomWalk);
+			//abortTimeslice();
+			//startTask(randomWalk);
 		}
-
-
 	}
 }
 
@@ -145,7 +155,7 @@ task detect() {
 	int total = 0;
 	int i;
 
-while(true) {
+	while(true) {
 
 		for(i = 0; i < 30; i++) {
 				int distance = getUSDistance(ultraSonic);
@@ -200,16 +210,7 @@ while(true) {
 				startTask(randomWalk);
 				//startTask(lineFollow);
 			}
-
-
-
-
-
-
-
-		/*
-
-		if (distance < 90 && stoppeds == 0) {
+		/*if (distance < 90 && stoppeds == 0) {
 		moveForward(speed, speed);
 		//setMotorSync(leftMotor, rightMotor, 0, speed);
 		wait1Msec(100);
@@ -221,16 +222,8 @@ while(true) {
 		stoppeds = 1;
 		wait1Msec(2000);
 		}
-
-
-
-
-
 		}
-
-
-
-		else {
+   	else {
 		//moveForward(50 * getUSDistance(ultraSonic))
 		speed = 0;
 		setMotorSync(leftMotor, rightMotor, 0, speed);
@@ -239,7 +232,7 @@ while(true) {
 		//setMotorSync(leftMotor,rightMotor, 0, 50);*/
 
 			}else{
-				startTask(randomWalk);
+				abortTimeslice();
 				//startTask(lineFollow);
 		}
 		avg = 0;
@@ -249,54 +242,12 @@ while(true) {
 
 task main()
 {
+	//startTask(detect);
+	startTask(lineFollow);
 	startTask(randomWalk);
-	//startTask(lineFollow);
-	startTask(detect);
 
 	while(true) {
 
+
 	}
 }
-
-////this is for wondering right
-//void randomRight() {
-//	setMotorSpeed(leftMotor, 60);
-//	setMotorSpeed(rightMotor, 50);
-//}
-
-////this is for wondering left
-//void randomLeft() {
-//	setMotorSpeed(leftMotor, 50);
-//	setMotorSpeed(rightMotor, 60);
-//}
-
-////this is the random walking task.
-//task randomWalk() {
-//	//varibles that
-//	long rTime = 0;
-//	long turnProb = 0;
-//	long rightProbability = 50;
-//	long leftProbability = 50;
-
-
-////this loop will let robot walking repeatly but with random pattern.
-//  while(true) {
-//  	//generates number between 0 and 99.
-//  	//starts with 50/50 chance of going left or right.
-//  	//lower end of probability will always be for turning left.
-//  	turnProb = rand() % 100;
-//  	rTime = rand() % 900 + 300;
-
-//	//random turning algorithm.
-//  	if(turnProb < leftProbability) {
-//  		randomLeft();
-//  		rightProbability += 10;
-//  		leftProbability -= 10;
-//  	} else {
-//  		randomRight();
-//  		rightProbability -= 10;
-//  		leftProbability += 10;
-//  	}
-//		wait1Msec(rTime);
-//	}
-//}
