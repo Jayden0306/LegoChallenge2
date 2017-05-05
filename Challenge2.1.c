@@ -218,36 +218,36 @@ task detect() {
 
 
 		//check if the obstacle is in the range of detection
-		if(avg < 90) {
+		if(avg < 100) {
 			stopTask(randomWalk);
 			stopTask(lineFollow);
 			start = 1;
-			if(avg > 70) {
+			if(avg > 88) {
 				speed = 80;
 				moveForward(speed, speed);
-				wait1Msec(800);
-				}else if(avg > 50){
-				speed = 75;
+				wait1Msec(100);
+				}else if(avg > 68){
+				speed = 68;
 				moveForward(speed, speed);
-				wait1Msec(800);
-				}else if(avg > 30) {
-				speed = 60;
+				wait1Msec(100);
+				}else if(avg > 56) {
+				speed = 56;
 				moveForward(speed, speed);
-				wait1Msec(800);
-				}else if (avg > 20) {
-				speed = 55;
+				wait1Msec(100);
+				}else if (avg > 44) {
+				speed = 44;
 				moveForward(speed, speed);
-				wait1Msec(800);
-				}else if (avg > 13) {
-				speed = 30;
+				wait1Msec(100);
+				}else if (avg > 32) {
+				speed = 32;
 				moveForward(speed, speed);
-				wait1Msec(400);
-				} else if (avg > 7) {
-				speed = 15;
+				wait1Msec(100);
+				} else if (avg > 20) {
+				speed = 20;
 				moveForward(speed, speed);
-				wait1Msec(300);
-				}else if (avg > 3) {
-				speed = 5;
+				wait1Msec(100);
+				}else if (avg > 10) {
+				speed = 12;
 				moveForward(speed, speed);
 				wait1Msec(100);
 				}else {
